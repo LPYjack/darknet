@@ -83,10 +83,12 @@ class METADATA(Structure):
 #lib = CDLL("libdarknet.so", RTLD_GLOBAL)
 hasGPU = True
 if os.name == "nt":
-    cwd = os.path.dirname(__file__)
-    os.environ['PATH'] = cwd + ';' + os.environ['PATH']
-    winGPUdll = os.path.join(cwd, "yolo_cpp_dll.dll")
-    winNoGPUdll = os.path.join(cwd, "yolo_cpp_dll_nogpu.dll")
+    # cwd = os.path.dirname(__file__)
+    # os.environ['PATH'] = cwd + ';' + os.environ['PATH']
+    # winGPUdll = os.path.join(cwd, "yolo_cpp_dll.dll")
+    # winNoGPUdll = os.path.join(cwd, "yolo_cpp_dll_nogpu.dll")
+    winGPUdll = "build/darknet/yolo_cpp_dll.dll"
+    winNoGPUdll = "build/darknet/yolo_cpp_dll_nogpu.dll"
     envKeys = list()
     for k, v in os.environ.items():
         envKeys.append(k)
@@ -522,6 +524,7 @@ def performBatchDetect(thresh= 0.25, configPath = "./cfg/yolov4.cfg", weightPath
     return batch_boxes, batch_scores, batch_classes    
 
 if __name__ == "__main__":
-    print(performDetect())
+    print(performDetect(imagePath="/home/lpy/mask/dataset/val/1_Handshaking_Handshaking_1_275.jpg", 
+        thresh= 0.25, configPath = "./mycfg/yolov4-mosaic-mask.cfg", weightPath = "./models/yolov4-mosaic-mask_best.weights", metaPath= "./mydata/mask.data"))
     #Uncomment the following line to see batch inference working 
     #print(performBatchDetect())
