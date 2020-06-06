@@ -1,5 +1,6 @@
 classes= 2
 train  = mydata/train.txt
-valid  = mydata/test.txt
+valid  = mydata/val.txt
+test  = mydata/test.txt
 names = mydata/mask.names
-backup = models/
+backup = models0605/

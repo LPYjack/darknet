@@ -367,7 +367,7 @@ LIB_API std::vector<bbox_t> Detector::tracking_id(std::vector<bbox_t> cur_bbox_v
         for (size_t i = 0; i < cur_bbox_vec.size(); ++i)
             cur_bbox_vec[i].track_id = det_gpu.track_id[cur_bbox_vec[i].obj_id]++;
         prev_bbox_vec_deque.push_front(cur_bbox_vec);
-        if (prev_bbox_vec_deque.size() > frames_story) prev_bbox_vec_deque.pop_back();
+        if (prev_bbox_vec_deque.size() > (unsigned)frames_story) prev_bbox_vec_deque.pop_back();
         return cur_bbox_vec;
     }
 
@@ -382,7 +382,7 @@ LIB_API std::vector<bbox_t> Detector::tracking_id(std::vector<bbox_t> cur_bbox_v
                     float center_x_diff = (float)(i.x + i.w/2) - (float)(k.x + k.w/2);
                     float center_y_diff = (float)(i.y + i.h/2) - (float)(k.y + k.h/2);
                     unsigned int cur_dist = sqrt(center_x_diff*center_x_diff + center_y_diff*center_y_diff);
-                    if (cur_dist < max_dist && (k.track_id == 0 || dist_vec[m] > cur_dist)) {
+                    if (cur_dist < (unsigned)max_dist && (k.track_id == 0 || dist_vec[m] > cur_dist)) {
                         dist_vec[m] = cur_dist;
                         cur_index = m;
                     }
@@ -406,7 +406,7 @@ LIB_API std::vector<bbox_t> Detector::tracking_id(std::vector<bbox_t> cur_bbox_v
 
     if (change_history) {
         prev_bbox_vec_deque.push_front(cur_bbox_vec);
-        if (prev_bbox_vec_deque.size() > frames_story) prev_bbox_vec_deque.pop_back();
+        if (prev_bbox_vec_deque.size() > (unsigned)frames_story) prev_bbox_vec_deque.pop_back();
     }
 
     return cur_bbox_vec;

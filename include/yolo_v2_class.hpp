@@ -697,15 +697,16 @@ public:
 
 class track_kalman_t
 {
-    int track_id_counter;
-    std::chrono::steady_clock::time_point global_last_time;
-    float dT;
 
 public:
     int max_objects;    // max objects for tracking
     int min_frames;     // min frames to consider an object as detected
     const float max_dist;   // max distance (in px) to track with the same ID
     cv::Size img_size;  // max value of x,y,w,h
+
+    int track_id_counter;
+    std::chrono::steady_clock::time_point global_last_time;
+    float dT;
 
     struct tst_t {
         int track_id;
@@ -851,8 +852,7 @@ public:
 
 
     track_kalman_t(int _max_objects = 1000, int _min_frames = 3, float _max_dist = 40, cv::Size _img_size = cv::Size(10000, 10000)) :
-        max_objects(_max_objects), min_frames(_min_frames), max_dist(_max_dist), img_size(_img_size),
-        track_id_counter(0)
+        max_objects(_max_objects), min_frames(_min_frames), max_dist(_max_dist), img_size(_img_size), track_id_counter(0)
     {
         kalman_vec.resize(max_objects);
         track_id_state_id_time.resize(max_objects);
@@ -876,8 +876,8 @@ public:
             float time_wait = 0.5;    // 0.5 second
             if (track_id_state_id_time[state_id].track_id > -1)
             {
-                if ((result_vec_pred[state_id].x > img_size.width) ||
-                    (result_vec_pred[state_id].y > img_size.height))
+                if ((result_vec_pred[state_id].x > (unsigned)img_size.width) ||
+                    (result_vec_pred[state_id].y > (unsigned)img_size.height))
                 {
                     track_id_state_id_time[state_id].track_id = -1;
                 }
@@ -897,7 +897,7 @@ public:
 
         float min_dist = std::numeric_limits<float>::max();
 
-        for (size_t i = 0; i < max_objects; ++i)
+        for (size_t i = 0; i < (unsigned)max_objects; ++i)
         {
             if (track_id_state_id_time[i].track_id > -1 && result_vec_pred[i].obj_id == find_box.obj_id && busy_vec[i] == false)
             {
@@ -987,7 +987,7 @@ public:
         clear_old_states();
         std::vector<bbox_t> result_vec;
 
-        for (size_t i = 0; i < max_objects; ++i)
+        for (size_t i = 0; i < (unsigned)max_objects; ++i)
         {
             tst_t tst = track_id_state_id_time[i];
             if (tst.track_id > -1) {
@@ -1022,7 +1022,7 @@ public:
         calc_dt();
         clear_old_states();
 
-        for (size_t i = 0; i < max_objects; ++i)
+        for (size_t i = 0; i < (unsigned)max_objects; ++i)
             track_id_state_id_time[i].detection_count--;
 
         std::vector<tst_t> tst_vec = find_state_ids(result_vec);

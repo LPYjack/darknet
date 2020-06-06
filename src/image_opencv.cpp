@@ -1145,6 +1145,99 @@ extern "C" void draw_train_loss(char *windows_name, mat_cv* img_src, int img_siz
 }
 // ----------------------------------------
 
+extern "C" mat_cv* draw_pr_chart(char *windows_name, int number_of_lines, int img_size, char* class_name, float iou_thresh)
+{
+    int img_offset = 60;
+    int draw_size = img_size - img_offset;
+    cv::Mat *img_ptr = new cv::Mat(img_size, img_size, CV_8UC3, CV_RGB(255, 255, 255));
+    cv::Mat &img = *img_ptr;
+    cv::Point pt1, pt2, pt_text;
+
+    try {
+        // draw new chart
+        char char_buff[100];
+        int i;
+        // vertical lines
+        pt1.x = img_offset; pt2.x = img_size, pt_text.x = 30;
+        for (i = 1; i <= number_of_lines; ++i) {
+            pt1.y = pt2.y = (float)i * draw_size / number_of_lines;
+            cv::line(img, pt1, pt2, CV_RGB(224, 224, 224), 1, 8, 0);
+            if (i % 10 == 0) {
+                sprintf(char_buff, "%2.1f", 1.0*(number_of_lines - i) / number_of_lines);
+                pt_text.y = pt1.y + 3;
+
+                cv::putText(img, char_buff, pt_text, cv::FONT_HERSHEY_COMPLEX_SMALL, 0.7, CV_RGB(0, 0, 0), 1, CV_AA);
+                cv::line(img, pt1, pt2, CV_RGB(128, 128, 128), 1, 8, 0);
+            }
+        }
+        // horizontal lines
+        pt1.y = draw_size; pt2.y = 0, pt_text.y = draw_size + 15;
+        for (i = 0; i <= number_of_lines; ++i) {
+            pt1.x = pt2.x = img_offset + (float)i * draw_size / number_of_lines;
+            cv::line(img, pt1, pt2, CV_RGB(224, 224, 224), 1, 8, 0);
+            if (i % 10 == 0) {
+                sprintf(char_buff, "%2.1f", 1.0 * i / number_of_lines);
+                pt_text.x = pt1.x - 20;
+                cv::putText(img, char_buff, pt_text, cv::FONT_HERSHEY_COMPLEX_SMALL, 0.7, CV_RGB(0, 0, 0), 1, CV_AA);
+                cv::line(img, pt1, pt2, CV_RGB(128, 128, 128), 1, 8, 0);
+            }
+        }
+
+        cv::putText(img, "Precision", cv::Point(10, 10), cv::FONT_HERSHEY_COMPLEX_SMALL, 0.7, CV_RGB(0, 0, 255), 1, CV_AA);
+        cv::putText(img, "Recall", cv::Point(draw_size - 50, img_size - 20), cv::FONT_HERSHEY_COMPLEX_SMALL, 0.7, CV_RGB(0, 0, 255), 1, CV_AA);
+        sprintf(char_buff, "Class: %s       IoU threshold: %.2f", class_name, iou_thresh);
+        pt1.x = 15, pt1.y = draw_size + 40;
+        cv::putText(img, char_buff, pt1, cv::FONT_HERSHEY_COMPLEX_SMALL, 0.7, CV_RGB(0, 0, 100), 1, CV_AA);
+
+    }
+    catch (...) {
+        cerr << "OpenCV exception: draw_train_chart() \n";
+    }
+    return (mat_cv*)img_ptr;
+}
+// ----------------------------------------
+
+extern "C" void draw_pr(char *windows_name, mat_cv* img_src, int img_size, double recall,
+                        double precision, int mjpeg_port, int save)
+{
+    cv::Mat &img = *(cv::Mat*)img_src;
+    static int history;
+    if (save) {
+        save_mat_png(img, windows_name);
+        history = 0;
+        return;
+    }
+    int img_offset = 60;
+    int draw_size = img_size - img_offset;
+
+    
+    // if (recall == 0) history = 0;
+    static cv::Point pt_old;
+    cv::Point pt;
+    pt.x = img_offset + (draw_size * recall);
+    pt.y = draw_size * (1 - precision);
+    // if (pt.y <= 0.0) pt.y = 1.0;
+    // if (pt.x <= 0.0) pt.x = 1.0;
+    // printf("recall = %f, precision = %f \n", recall, precision);
+    // printf("pt.x = %d, pt.y = %d \n", pt.x, pt.y);
+
+    
+    cv::circle(img, pt, 1, CV_RGB(0, 0, 255), CV_FILLED, 8, 0);
+
+    if (history != 0) {
+        cv::line(img, pt_old, pt, CV_RGB(0, 0, 255), 5, 8, 0);
+        pt_old = pt;
+    }
+    else {
+        history = 1;
+        pt_old = pt;
+    }
+    
+    // if (mjpeg_port > 0) send_mjpeg((mat_cv *)&img, mjpeg_port, 500000, 70);
+
+}
+// ----------------------------------------
+
 
 // ====================================================================
 // Data augmentation

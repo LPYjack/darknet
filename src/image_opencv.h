@@ -96,6 +96,12 @@ mat_cv* draw_train_chart(char *windows_name, float max_img_loss, int max_batches
 void draw_train_loss(char *windows_name, mat_cv* img, int img_size, float avg_loss, float max_img_loss, int current_batch, int max_batches,
     float precision, int draw_precision, char *accuracy_name, int dont_show, int mjpeg_port, double time_remaining);
 
+// Draw Loss & Accuracy chart
+mat_cv* draw_pr_chart(char *windows_name, int number_of_lines, int img_size, char* class_name, float iou_thresh);
+void draw_pr(char *windows_name, mat_cv* img_src, int img_size, double recall,
+                        double precision, int mjpeg_port, int save);
+
+
 // Data augmentation
 image image_data_augmentation(mat_cv* mat, int w, int h,
     int pleft, int ptop, int swidth, int sheight, int flip,
