@@ -3,4 +3,4 @@ train  = mydata/train.txt
 valid  = mydata/val.txt
 test  = mydata/test.txt
 names = mydata/mask.names
-backup = models0605/
+backup = models0607/
